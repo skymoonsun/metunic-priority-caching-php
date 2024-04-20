@@ -1,0 +1,33 @@
+services:
+
+  php:
+    build:
+      context: ./docker/php
+    container_name: metunic-priority-caching-php
+    environment:
+      APP_ENV: dev
+    volumes:
+      - ./app/:/var/www/app
+    ports:
+      - '9000:9000'
+    restart: always
+    networks:
+      - metunic-priority-caching-network
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: metunic-priority-caching-nginx
+    ports:
+      - '80:80'
+    volumes:
+      - ./app/:/var/www/app
+      - ./docker/nginx/default-compose.conf:/etc/nginx/conf.d/default-compose.conf
+    depends_on:
+      - php
+    restart: always
+    networks:
+      - metunic-priority-caching-network
+
+networks:
+  metunic-priority-caching-network:
+    driver: bridge
